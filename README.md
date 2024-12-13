@@ -8,6 +8,26 @@ This is a web API to convert a value into another format, for example, an arabic
 
 You can find a Swagger UI endpoint at `http://{{host}}/swagger-ui` 
 
+### Convert value
+
+Submit a conversion method (one of `DECIMAL_TO_ROMAN` or `BINARY_TO_ROMAN`) and a value that should be compared
+
+```
+POST http://{{host}}/convert
+Content-Type: application/json
+
+{
+    "conversionMethod": "DECIMAL_TO_ROMAN",
+    "value": "15"
+}
+```
+
+The result of the service is a plain text:
+
+```
+XIV
+```
+
 ### Extension with another number converter
 
 Adding new converters:

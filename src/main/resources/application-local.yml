@@ -9,4 +9,4 @@ management:
 logging:
   level:
     root: info
-    dev.matzat.conversionservice: debug
+    dev.matzat.numberconverter: debug
