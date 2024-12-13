@@ -80,14 +80,23 @@ public class BinaryToRomanConverterTest {
     @Test
     @DisplayName("WHEN a binary value out of range is submitted to the converter THEN an IllegalArgumentException is thrown")
     public void testBinaryToRomanOutOfRange() {
-        assertThatThrownBy(() -> converter.convert("111110100000")).isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("Binary to roman converter does not support converting larger binary values than 111110100000");
+        val givenInput = "111110100000";
+        assertThatThrownBy(() -> converter.convert(givenInput)).isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining(String.format("Binary to roman converter does not support converting larger binary values than %s", givenInput));
     }
 
     @Test
     @DisplayName("WHEN an invalid binary value is submitted to the converter THEN an IllegalArgumentException is thrown")
     public void testInvalidBinaryToRoman() {
-        assertThatThrownBy(() -> converter.convert("1X0X1X0X")).isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("Submitted input '1X0X1X0X' is not a valid binary value");
+        val givenInput = "1X0X1X0X";
+        assertThatThrownBy(() -> converter.convert(givenInput)).isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining(String.format("Submitted input '%s' is not a valid binary value", givenInput));
+    }
+
+    @Test
+    @DisplayName("WHEN the conversion method BINARY_TO_ROMAN is submitted THEN true is returned, false otherwise")
+    public void testSupportTheCorrectMethod() {
+        assertThat(converter.supports(ConversionMethod.BINARY_TO_ROMAN)).isTrue();
+        assertThat(converter.supports(ConversionMethod.DECIMAL_TO_ROMAN)).isFalse();
     }
 }

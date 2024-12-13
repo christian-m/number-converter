@@ -8,6 +8,16 @@ This is a web API to convert a value into another format, for example, an arabic
 
 You can find a Swagger UI endpoint at `http://{{host}}/swagger-ui` 
 
+### Extension with another number converter
+
+Adding new converters:
+
+* Add a new conversion method to the enum `dev.matzat.numberconverter.converter.ConversionMethod`
+* Create a class that implements the interface `dev.matzat.numberconverter.converter.Converter`
+* Implement the method `boolean supports(final ConversionMethod conversionMethod)` so that it returns true if your new conversion method is given as a parameter
+* Implement the method `String convert(final String value)` with your new conversion
+* Tag the new converter class as Spring `@Component`
+
 ## Local development
 
 ### Monitoring
