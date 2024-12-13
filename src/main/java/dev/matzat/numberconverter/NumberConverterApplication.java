@@ -5,9 +5,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 @SuppressWarnings("HideUtilityClassConstructor")
-public class ConversionServiceApplication {
+public class NumberConverterApplication {
 
     public static void main(final String[] args) {
-        SpringApplication.run(ConversionServiceApplication.class, args);
+        SpringApplication.run(NumberConverterApplication.class, args);
     }
 }

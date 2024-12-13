@@ -13,8 +13,8 @@ import static io.swagger.v3.core.jackson.ModelResolver.enumsAsRef;
 @Configuration
 @OpenAPIDefinition(
     info = @Info(
-        title = "Value Conversion API",
-        description = "This is a web service to convert a value into another format."
+        title = "Number Converter API",
+        description = "This is a web service to convert a number into another value format."
     )
 )
 @SuppressWarnings("DesignForExtension")

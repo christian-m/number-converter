@@ -53,7 +53,7 @@ public class ConverterControllerIntegrationTest {
             .expectBody(ProblemDetail.class)
             .consumeWith(response -> {
                 val problemDetail = response.getResponseBody();
-                assertThat(problemDetail.getDetail()).isEqualTo(String.format("Submitted input '%s' is not a valid decimal number value", givenValue));
+                assertThat(problemDetail.getDetail()).isEqualTo("convert.conversionRequest.value: The submitted value is not valid for the submitted conversion method");
                 assertThat(problemDetail.getStatus()).isEqualTo(422);
             });
     }
@@ -86,7 +86,7 @@ public class ConverterControllerIntegrationTest {
             .expectBody(ProblemDetail.class)
             .consumeWith(response -> {
                 val problemDetail = response.getResponseBody();
-                assertThat(problemDetail.getDetail()).isEqualTo(String.format("Submitted input '%s' is not a valid binary value", givenValue));
+                assertThat(problemDetail.getDetail()).isEqualTo("convert.conversionRequest.value: The submitted value is not valid for the submitted conversion method");
                 assertThat(problemDetail.getStatus()).isEqualTo(422);
             });
     }

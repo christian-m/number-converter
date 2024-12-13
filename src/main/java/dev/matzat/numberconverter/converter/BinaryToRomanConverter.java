@@ -18,15 +18,25 @@ public final class BinaryToRomanConverter implements Converter {
     }
 
     @Override
-    public String convert(final String value) throws IllegalArgumentException {
+    public boolean isValid(final String value) {
+        if (!value.matches("[01]+")) {
+            return false;
+        }
         try {
             val input = Integer.parseInt(value, 2);
-            if (input > MAX_SUPPORTED_INPUT_VALUE) {
-                throw new IllegalArgumentException("Binary to roman converter does not support converting larger binary values than 111110100000");
-            }
-            return decimalToRomanConverter.convert(Integer.toString(input));
+            return (input <= MAX_SUPPORTED_INPUT_VALUE);
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(String.format("Submitted input '%s' is not a valid binary value", value), e);
+            return false;
         }
+    }
+
+    @Override
+    public String convert(final String value) throws IllegalArgumentException {
+        if (!isValid(value)) {
+            throw new IllegalArgumentException(String.format("Submitted input '%s' is not a valid binary value or exceeds the limit of them maximum (%d)",
+                value, MAX_SUPPORTED_INPUT_VALUE));
+        }
+        val input = Integer.parseInt(value, 2);
+        return decimalToRomanConverter.convert(Integer.toString(input));
     }
 }

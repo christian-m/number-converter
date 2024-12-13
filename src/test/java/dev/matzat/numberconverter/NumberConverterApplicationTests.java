@@ -13,7 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @AllArgsConstructor(onConstructor_ = @Autowired)
-class ConversionServiceApplicationTests {
+class NumberConverterApplicationTests {
 
     private BinaryToRomanConverter binaryToRomanConverter;
 

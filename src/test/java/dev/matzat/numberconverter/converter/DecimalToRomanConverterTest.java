@@ -83,7 +83,7 @@ public class DecimalToRomanConverterTest {
     @DisplayName("WHEN an integer out of range is submitted to the converter THEN an IllegalArgumentException is thrown")
     public void testIntToRomanValueOutOfRange(String input) {
         assertThatThrownBy(() -> converter.convert(input)).isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("Decimal to roman converter does not support converting larger numbers than 3999 or negative numbers");
+            .hasMessageContaining(String.format("Submitted input '%s' is not a valid decimal value or is not in the range of 0 - 3999", input));
     }
 
     @Test
@@ -94,10 +94,16 @@ public class DecimalToRomanConverterTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"", "x", "A"})
-    @DisplayName("WHEN an invalid value is submitted THEN an IllegalArgumentException is thrown")
+    @MethodSource("intToRomanTestdata")
+    @DisplayName("WHEN a valid value is submitted THEN the validation returns true")
     public void testValidationSuccess(final String givenInput) {
-        assertThatThrownBy(() -> converter.convert(givenInput)).isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining(String.format("Submitted input '%s' is not a valid decimal number value", givenInput));
+        assertThat(converter.isValid(givenInput)).isTrue();
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"", "x", "A", "-1", "4000"})
+    @DisplayName("WHEN an invalid value is submitted THEN the validation returns false")
+    public void testValidationFailure(final String givenInput) {
+        assertThat(converter.isValid(givenInput)).isFalse();
     }
 }

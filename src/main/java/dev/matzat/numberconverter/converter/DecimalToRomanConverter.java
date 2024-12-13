@@ -16,8 +16,25 @@ public final class DecimalToRomanConverter implements Converter {
     }
 
     @Override
+    public boolean isValid(final String value) {
+        if (!value.matches("[0-9]+")) {
+            return false;
+        }
+        try {
+            int intValue = Integer.parseInt(value);
+            return intValue >= MIN_SUPPORTED_INPUT_VALUE && intValue <= MAX_SUPPORTED_INPUT_VALUE;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    @Override
     public String convert(final String value) throws IllegalArgumentException {
-        var input = validateAndConvertInput(value);
+        if (!isValid(value)) {
+            throw new IllegalArgumentException(String.format("Submitted input '%s' is not a valid decimal value or is not in the range of %d - %d",
+                value, MIN_SUPPORTED_INPUT_VALUE, MAX_SUPPORTED_INPUT_VALUE));
+        }
+        var input = Integer.parseInt(value);
         val roman = new StringBuilder();
         for (RomanBase conversionBase : RomanBase.values()) {
             if (input < conversionBase.getBase()) {
@@ -27,19 +44,6 @@ public final class DecimalToRomanConverter implements Converter {
             input = input % conversionBase.getBase();
         }
         return roman.toString();
-    }
-
-    private int validateAndConvertInput(final String input) {
-        final int inputNumber;
-        try {
-            inputNumber = Integer.parseInt(input);
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(String.format("Submitted input '%s' is not a valid decimal number value", input), e);
-        }
-        if (inputNumber < MIN_SUPPORTED_INPUT_VALUE || inputNumber > MAX_SUPPORTED_INPUT_VALUE) {
-            throw new IllegalArgumentException("Decimal to roman converter does not support converting larger numbers than 3999 or negative numbers");
-        }
-        return inputNumber;
     }
 
     @Getter

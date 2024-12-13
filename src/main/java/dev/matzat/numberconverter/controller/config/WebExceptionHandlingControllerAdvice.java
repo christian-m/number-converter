@@ -3,6 +3,7 @@ package dev.matzat.numberconverter.controller.config;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.ConstraintViolationException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -11,12 +12,17 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.server.ServerWebInputException;
 
+import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @ControllerAdvice
@@ -85,6 +91,26 @@ class WebExceptionHandlingControllerAdvice {
         );
     }
 
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    @ApiResponse(
+        responseCode = "422",
+        description = DESCRIPTION_422,
+        content = {
+            @Content(
+                mediaType = MediaType.APPLICATION_PROBLEM_JSON_VALUE,
+                schema = @Schema(implementation = ProblemDetail.class)
+            )
+        }
+    )
+    public ProblemDetail handleConstraintViolationException(final ConstraintViolationException exception) {
+        val fieldErrors = exception.getConstraintViolations()
+            .stream().map(it -> new FieldError(it.getRootBean().toString(), it.getPropertyPath().toString(), it.getMessage())).toList();
+        val problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_ENTITY, fieldErrorsToString(fieldErrors));
+        problemDetail.setProperties(Map.of("fieldErrorDetails", fieldErrorsToMap(fieldErrors)));
+        return problemDetail;
+    }
+
     @ExceptionHandler(Throwable.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ApiResponse(
@@ -108,5 +134,17 @@ class WebExceptionHandlingControllerAdvice {
                 new String[]{exceptionName},
                 LocaleContextHolder.getLocale())
         );
+    }
+
+    private String fieldErrorsToString(final List<FieldError> fieldErrors) {
+        return String.join(", ", fieldErrors.stream().map((it) ->
+            String.format("%s: %s", it.getField(), it.getDefaultMessage())).collect(Collectors.toSet()));
+    }
+
+    private Map<String, Set<String>> fieldErrorsToMap(final List<FieldError> fieldErrors) {
+        return fieldErrors.stream().collect(Collectors.groupingBy(
+            FieldError::getField,
+            Collectors.mapping(
+                FieldError::getDefaultMessage, Collectors.toSet())));
     }
 }

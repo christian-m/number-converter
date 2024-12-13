@@ -47,6 +47,7 @@ public class ConverterControllerTest {
         val givenValue = "15";
         val expectedValue = "XV";
         when(converterResolver.resolve(ConversionMethod.DECIMAL_TO_ROMAN)).thenReturn(decimalToRomanConverter);
+        when(decimalToRomanConverter.isValid(givenValue)).thenReturn(true);
         when(decimalToRomanConverter.convert(givenValue)).thenReturn(expectedValue);
         webClient.post()
             .uri("/convert")
@@ -63,7 +64,7 @@ public class ConverterControllerTest {
     public void testConversionControllerInvalidDecimalValue() {
         val givenValue = "XA";
         when(converterResolver.resolve(ConversionMethod.DECIMAL_TO_ROMAN)).thenReturn(decimalToRomanConverter);
-        when(decimalToRomanConverter.convert(givenValue)).thenThrow(IllegalArgumentException.class);
+        when(decimalToRomanConverter.isValid(givenValue)).thenReturn(false);
         webClient.post()
             .uri("/convert")
             .contentType(MediaType.APPLICATION_JSON)
@@ -71,7 +72,11 @@ public class ConverterControllerTest {
             .exchange()
             .expectStatus().isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY)
             .expectBody(ProblemDetail.class)
-            .consumeWith(response -> assertThat(response.getResponseBody().getStatus()).isEqualTo(422));
+            .consumeWith(response -> {
+                val problemDetail = response.getResponseBody();
+                assertThat(problemDetail.getDetail()).isEqualTo("convert.conversionRequest.value: The submitted value is not valid for the submitted conversion method");
+                assertThat(problemDetail.getStatus()).isEqualTo(422);
+            });
     }
 
     @Test
@@ -80,6 +85,7 @@ public class ConverterControllerTest {
         val givenValue = "1111";
         val expectedValue = "XV";
         when(converterResolver.resolve(ConversionMethod.BINARY_TO_ROMAN)).thenReturn(binaryToRomanConverter);
+        when(binaryToRomanConverter.isValid(givenValue)).thenReturn(true);
         when(binaryToRomanConverter.convert(givenValue)).thenReturn(expectedValue);
         webClient.post()
             .uri("/convert")
@@ -96,7 +102,7 @@ public class ConverterControllerTest {
     public void testConversionControllerInvalidBinaryValue() {
         val givenValue = "XA";
         when(converterResolver.resolve(ConversionMethod.BINARY_TO_ROMAN)).thenReturn(binaryToRomanConverter);
-        when(binaryToRomanConverter.convert(givenValue)).thenThrow(IllegalArgumentException.class);
+        when(binaryToRomanConverter.isValid(givenValue)).thenReturn(false);
         webClient.post()
             .uri("/convert")
             .contentType(MediaType.APPLICATION_JSON)
@@ -104,7 +110,11 @@ public class ConverterControllerTest {
             .exchange()
             .expectStatus().isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY)
             .expectBody(ProblemDetail.class)
-            .consumeWith(response -> assertThat(response.getResponseBody().getStatus()).isEqualTo(422));
+            .consumeWith(response -> {
+                val problemDetail = response.getResponseBody();
+                assertThat(problemDetail.getDetail()).isEqualTo("convert.conversionRequest.value: The submitted value is not valid for the submitted conversion method");
+                assertThat(problemDetail.getStatus()).isEqualTo(422);
+            });
     }
 
     @Test
@@ -139,7 +149,7 @@ public class ConverterControllerTest {
             .expectBody(ProblemDetail.class)
             .consumeWith(response -> {
                 val problemDetail = response.getResponseBody();
-                assertThat(problemDetail.getDetail()).isEqualTo("No converter found for conversion method");
+                assertThat(problemDetail.getDetail()).isEqualTo("convert.conversionRequest.conversionMethod: No converter found for conversion method");
                 assertThat(problemDetail.getStatus()).isEqualTo(422);
             });
     }

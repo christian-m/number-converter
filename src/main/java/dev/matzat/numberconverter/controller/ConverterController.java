@@ -2,6 +2,7 @@ package dev.matzat.numberconverter.controller;
 
 import dev.matzat.numberconverter.converter.ConverterResolver;
 import dev.matzat.numberconverter.model.ConversionRequest;
+import dev.matzat.numberconverter.validation.ValidConversionRequest;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -40,6 +41,7 @@ public class ConverterController {
                 schema = @Schema(implementation = ConversionRequest.class),
                 examples = @ExampleObject(value = "{ \"conversionMethod\": \"DECIMAL_TO_ROMAN\", \"value\": \"22\" }")))
         @Valid
+        @ValidConversionRequest
         @RequestBody
         final ConversionRequest conversionRequest
     ) {

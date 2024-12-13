@@ -8,6 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -82,7 +83,7 @@ public class BinaryToRomanConverterTest {
     public void testBinaryToRomanOutOfRange() {
         val givenInput = "111110100000";
         assertThatThrownBy(() -> converter.convert(givenInput)).isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining(String.format("Binary to roman converter does not support converting larger binary values than %s", givenInput));
+            .hasMessageContaining(String.format("Submitted input '%s' is not a valid binary value or exceeds the limit of them maximum (3999)", givenInput));
     }
 
     @Test
@@ -98,5 +99,19 @@ public class BinaryToRomanConverterTest {
     public void testSupportTheCorrectMethod() {
         assertThat(converter.supports(ConversionMethod.BINARY_TO_ROMAN)).isTrue();
         assertThat(converter.supports(ConversionMethod.DECIMAL_TO_ROMAN)).isFalse();
+    }
+
+    @ParameterizedTest
+    @MethodSource("binaryToRomanTestdata")
+    @DisplayName("WHEN a valid value is submitted THEN the validation returns true")
+    public void testValidationSuccess(final String givenInput) {
+        assertThat(converter.isValid(givenInput)).isTrue();
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"", "x", "A", "15", "111110100000"})
+    @DisplayName("WHEN an invalid value is submitted THEN the validation returns false")
+    public void testValidationFailure(final String givenInput) {
+        assertThat(converter.isValid(givenInput)).isFalse();
     }
 }
