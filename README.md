@@ -30,6 +30,12 @@ XIV
 
 An audit log entry is written to the database for any request to the `/convert` endpoint.
 
+You can get a paged log of the audits using the request:
+
+```
+GET http://{{host}}/audit-log
+```
+
 ### Extension with another number converter
 
 Currently are implemented:

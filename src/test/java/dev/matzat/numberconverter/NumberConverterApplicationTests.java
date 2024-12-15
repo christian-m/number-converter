@@ -1,5 +1,6 @@
 package dev.matzat.numberconverter;
 
+import dev.matzat.numberconverter.controller.AuditLogController;
 import dev.matzat.numberconverter.controller.ConverterController;
 import dev.matzat.numberconverter.converter.BinaryToRomanConverter;
 import dev.matzat.numberconverter.converter.ConverterResolver;
@@ -22,7 +23,9 @@ class NumberConverterApplicationTests extends SpringBootTestBase {
 
     private ConverterController converterController;
 
-    private AuditLogRepository auditLogRepository;
+    private AuditLogController auditLogRepository;
+
+    private AuditLogRepository auditLogController;
 
     @Test
     void contextLoads() {
@@ -30,6 +33,7 @@ class NumberConverterApplicationTests extends SpringBootTestBase {
         assertThat(binaryToRomanConverter).isNotNull();
         assertThat(converterResolver).isNotNull();
         assertThat(converterController).isNotNull();
+        assertThat(auditLogController).isNotNull();
         assertThat(auditLogRepository).isNotNull();
     }
 }
