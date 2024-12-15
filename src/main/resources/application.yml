@@ -41,6 +41,11 @@ management:
 spring:
   jackson:
     default-property-inclusion: non_null
+  jpa:
+    properties:
+      hibernate.jdbc.time_zone: UTC
+    hibernate.ddl-auto: validate
+    open-in-view: false
   web:
     locale: en
 

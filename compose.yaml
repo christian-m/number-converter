@@ -1,4 +1,14 @@
 services:
+  postgres:
+    image: postgres:14-alpine
+    environment:
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./docker/postgresql/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+      - ./docker/postgresql/db-data:/var/lib/postgresql/data
+
   prometheus:
     image: prom/prometheus:v2.45.0
     ports:

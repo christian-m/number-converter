@@ -28,6 +28,8 @@ The result of the service is a plain text:
 XIV
 ```
 
+An audit log entry is written to the database for any request to the `/convert` endpoint.
+
 ### Extension with another number converter
 
 Currently are implemented:

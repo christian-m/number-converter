@@ -1,15 +1,18 @@
 package dev.matzat.numberconverter.controller;
 
+import dev.matzat.numberconverter.SpringBootTestBase;
 import dev.matzat.numberconverter.converter.ConversionMethod;
 import dev.matzat.numberconverter.model.ConversionRequest;
+import dev.matzat.numberconverter.persistence.AuditLogRepository;
 import lombok.AllArgsConstructor;
 import lombok.val;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
@@ -18,12 +21,19 @@ import org.springframework.web.reactive.function.BodyInserters;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
 @AllArgsConstructor(onConstructor_ = @Autowired)
-public class ConverterControllerIntegrationTest {
+@ExtendWith(MockitoExtension.class)
+public class ConverterControllerIntegrationTest extends SpringBootTestBase {
 
     private WebTestClient webClient;
+
+    private AuditLogRepository auditLogRepository;
+
+    @BeforeEach
+    void setUp() {
+        auditLogRepository.deleteAll();
+    }
 
     @Test
     @DisplayName("WHEN a valid decimal value is submitted THEN a converted value is returned")
@@ -38,6 +48,13 @@ public class ConverterControllerIntegrationTest {
             .expectStatus().isOk()
             .expectBody(String.class)
             .isEqualTo(expectedValue);
+        val auditLogs = auditLogRepository.findAll();
+        assertThat(auditLogs).hasSize(1);
+        val auditLog = auditLogs.iterator().next();
+        assertThat(auditLog.getInput()).isEqualTo("{\"conversionMethod\":\"DECIMAL_TO_ROMAN\",\"value\":\"15\"}");
+        assertThat(auditLog.getOutput()).isEqualTo("XV");
+        assertThat(auditLog.getStatusCode()).isEqualTo("200 OK");
+        assertThat(auditLog.isSuccess()).isTrue();
     }
 
     @Test
@@ -56,6 +73,13 @@ public class ConverterControllerIntegrationTest {
                 assertThat(problemDetail.getDetail()).isEqualTo("convert.conversionRequest.value: The submitted value is not valid for the submitted conversion method");
                 assertThat(problemDetail.getStatus()).isEqualTo(422);
             });
+        val auditLogs = auditLogRepository.findAll();
+        assertThat(auditLogs).hasSize(1);
+        val auditLog = auditLogs.iterator().next();
+        assertThat(auditLog.getInput()).isEqualTo("{\"conversionMethod\":\"DECIMAL_TO_ROMAN\",\"value\":\"XA\"}");
+        assertThat(auditLog.getOutput()).isEqualTo("{\"type\":\"about:blank\",\"title\":\"Unprocessable Entity\",\"status\":422,\"detail\":\"convert.conversionRequest.value: The submitted value is not valid for the submitted conversion method\",\"instance\":\"/convert\",\"fieldErrorDetails\":{\"convert.conversionRequest.value\":[\"The submitted value is not valid for the submitted conversion method\"]}}");
+        assertThat(auditLog.getStatusCode()).isEqualTo("422 UNPROCESSABLE_ENTITY");
+        assertThat(auditLog.isSuccess()).isFalse();
     }
 
     @Test
@@ -71,6 +95,13 @@ public class ConverterControllerIntegrationTest {
             .expectStatus().isOk()
             .expectBody(String.class)
             .isEqualTo(expectedValue);
+        val auditLogs = auditLogRepository.findAll();
+        assertThat(auditLogs).hasSize(1);
+        val auditLog = auditLogs.iterator().next();
+        assertThat(auditLog.getInput()).isEqualTo("{\"conversionMethod\":\"BINARY_TO_ROMAN\",\"value\":\"1111\"}");
+        assertThat(auditLog.getOutput()).isEqualTo("XV");
+        assertThat(auditLog.getStatusCode()).isEqualTo("200 OK");
+        assertThat(auditLog.isSuccess()).isTrue();
     }
 
     @Test
@@ -89,6 +120,13 @@ public class ConverterControllerIntegrationTest {
                 assertThat(problemDetail.getDetail()).isEqualTo("convert.conversionRequest.value: The submitted value is not valid for the submitted conversion method");
                 assertThat(problemDetail.getStatus()).isEqualTo(422);
             });
+        val auditLogs = auditLogRepository.findAll();
+        assertThat(auditLogs).hasSize(1);
+        val auditLog = auditLogs.iterator().next();
+        assertThat(auditLog.getInput()).isEqualTo("{\"conversionMethod\":\"BINARY_TO_ROMAN\",\"value\":\"XA\"}");
+        assertThat(auditLog.getOutput()).isEqualTo("{\"type\":\"about:blank\",\"title\":\"Unprocessable Entity\",\"status\":422,\"detail\":\"convert.conversionRequest.value: The submitted value is not valid for the submitted conversion method\",\"instance\":\"/convert\",\"fieldErrorDetails\":{\"convert.conversionRequest.value\":[\"The submitted value is not valid for the submitted conversion method\"]}}");
+        assertThat(auditLog.getStatusCode()).isEqualTo("422 UNPROCESSABLE_ENTITY");
+        assertThat(auditLog.isSuccess()).isFalse();
     }
 
     @Test
@@ -107,5 +145,12 @@ public class ConverterControllerIntegrationTest {
                 assertThat(problemDetail.getDetail()).isEqualTo("400 BAD_REQUEST \"Failed to read HTTP message\"");
                 assertThat(problemDetail.getStatus()).isEqualTo(400);
             });
+        val auditLogs = auditLogRepository.findAll();
+        assertThat(auditLogs).hasSize(1);
+        val auditLog = auditLogs.iterator().next();
+        assertThat(auditLog.getInput()).isEqualTo("{\"conversionMethod\":\"INVALID\",\"value\":\"15\"}");
+        assertThat(auditLog.getOutput()).isEqualTo("{\"type\":\"about:blank\",\"title\":\"Bad Request\",\"status\":400,\"detail\":\"400 BAD_REQUEST \\\"Failed to read HTTP message\\\"\",\"instance\":\"/convert\"}");
+        assertThat(auditLog.getStatusCode()).isEqualTo("400 BAD_REQUEST");
+        assertThat(auditLog.isSuccess()).isFalse();
     }
 }
