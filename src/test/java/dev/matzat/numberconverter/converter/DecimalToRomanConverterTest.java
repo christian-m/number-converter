@@ -83,7 +83,7 @@ public class DecimalToRomanConverterTest {
     @DisplayName("WHEN an integer out of range is submitted to the converter THEN an IllegalArgumentException is thrown")
     public void testIntToRomanValueOutOfRange(String input) {
         assertThatThrownBy(() -> converter.convert(input)).isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining(String.format("Submitted input '%s' is not a valid decimal value or is not in the range of 0 - 3999", input));
+            .hasMessage(String.format("Submitted input '%s' is not a valid decimal value or is not in the range of 0 - 3999", input));
     }
 
     @Test

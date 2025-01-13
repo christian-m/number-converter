@@ -37,7 +37,7 @@ public class ConverterController {
     public ResponseEntity<String> convert(
         @io.swagger.v3.oas.annotations.parameters.RequestBody(
             description = "Value to convert and conversion strategy", required = true,
-            content = @Content(mediaType = "application/json",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                 schema = @Schema(implementation = ConversionRequest.class),
                 examples = @ExampleObject(value = "{ \"conversionMethod\": \"DECIMAL_TO_ROMAN\", \"value\": \"22\" }")))
         @Valid

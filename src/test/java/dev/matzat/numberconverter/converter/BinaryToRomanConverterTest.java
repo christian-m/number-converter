@@ -83,7 +83,7 @@ public class BinaryToRomanConverterTest {
     public void testBinaryToRomanOutOfRange() {
         val givenInput = "111110100000";
         assertThatThrownBy(() -> converter.convert(givenInput)).isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining(String.format("Submitted input '%s' is not a valid binary value or exceeds the limit of them maximum (3999)", givenInput));
+            .hasMessage(String.format("Submitted input '%s' is not a valid binary value or exceeds the limit of the maximum (111110011111)", givenInput));
     }
 
     @Test
@@ -91,7 +91,7 @@ public class BinaryToRomanConverterTest {
     public void testInvalidBinaryToRoman() {
         val givenInput = "1X0X1X0X";
         assertThatThrownBy(() -> converter.convert(givenInput)).isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining(String.format("Submitted input '%s' is not a valid binary value", givenInput));
+            .hasMessage(String.format("Submitted input '%s' is not a valid binary value or exceeds the limit of the maximum (111110011111)", givenInput));
     }
 
     @Test

@@ -23,6 +23,7 @@ import reactor.core.publisher.Mono;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.charset.StandardCharsets;
 import java.time.Clock;
@@ -60,7 +61,7 @@ public class AuditWebFilter implements WebFilter {
             val uriPath = requestDecorator.getURI().getPath();
             if (uriPath.startsWith("/convert")) {
                 val input = requestDecorator.getRequestBody();
-                val output = getResponseBody(responseDecorator);
+                val output = responseDecorator.getResponseBody();
                 val responseStatusCode = response.getStatusCode();
                 @SuppressWarnings("AvoidInlineConditionals")
                 val statusCode = responseStatusCode != null ? responseStatusCode.toString() : "unknown";
@@ -71,10 +72,6 @@ public class AuditWebFilter implements WebFilter {
                 auditLogRepository.save(new AuditLog(timestamp, input, output, statusCode, success));
             }
         });
-    }
-
-    private static String getResponseBody(final ResponseDecorator responseDecorator) {
-        return responseDecorator.getResponseBody();
     }
 }
 
@@ -98,7 +95,9 @@ class ResponseDecorator extends ServerHttpResponseDecorator {
                     if (uriPath.startsWith("/convert")) {
                         try {
                             val bodyStream = new ByteArrayOutputStream();
-                            Channels.newChannel(bodyStream).write(responseBuffer.asByteBuffer().asReadOnlyBuffer());
+                            val byteBuffer = ByteBuffer.allocate(responseBuffer.readableByteCount());
+                            responseBuffer.toByteBuffer(byteBuffer);
+                            Channels.newChannel(bodyStream).write(byteBuffer.asReadOnlyBuffer());
                             responseBody = bodyStream.toString(StandardCharsets.UTF_8);
                         } catch (IOException e) {
                             log.debug("parsing response body failed", e);
@@ -129,7 +128,9 @@ class RequestDecorator extends ServerHttpRequestDecorator {
         return super.getBody().doOnNext(requestBuffer -> {
             try {
                 val bodyStream = new ByteArrayOutputStream();
-                Channels.newChannel(bodyStream).write(requestBuffer.asByteBuffer().asReadOnlyBuffer());
+                val byteBuffer = ByteBuffer.allocate(requestBuffer.readableByteCount());
+                requestBuffer.toByteBuffer(byteBuffer);
+                Channels.newChannel(bodyStream).write(byteBuffer.asReadOnlyBuffer());
                 requestBody = bodyStream.toString(StandardCharsets.UTF_8);
             } catch (IOException e) {
                 log.debug("parsing request body failed", e);

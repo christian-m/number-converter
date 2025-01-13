@@ -7,7 +7,6 @@ import jakarta.validation.ConstraintValidatorContext;
 import jakarta.validation.constraintvalidation.SupportedValidationTarget;
 import jakarta.validation.constraintvalidation.ValidationTarget;
 import lombok.val;
-import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 
 import java.util.NoSuchElementException;
 
@@ -31,8 +30,7 @@ public final class ConversionRequestValidator implements ConstraintValidator<Val
     }
 
     @Override
-    public boolean isValid(final ConversionRequest conversionRequest, final ConstraintValidatorContext rawContext) {
-        val context = rawContext.unwrap(HibernateConstraintValidatorContext.class);
+    public boolean isValid(final ConversionRequest conversionRequest, final ConstraintValidatorContext context) {
         try {
             val converter = converterResolver.resolve(conversionRequest.getConversionMethod());
             if (converter.isValid(conversionRequest.getValue())) {
@@ -40,14 +38,12 @@ public final class ConversionRequestValidator implements ConstraintValidator<Val
             }
             context.disableDefaultConstraintViolation();
             context.buildConstraintViolationWithTemplate(this.annotation.message())
-                .enableExpressionLanguage()
                 .addPropertyNode("value")
                 .addConstraintViolation();
             return false;
         } catch (NoSuchElementException e) {
             context.disableDefaultConstraintViolation();
             context.buildConstraintViolationWithTemplate(CONVERTER_NOT_FOUND_MESSAGE_TEMPLATE)
-                .enableExpressionLanguage()
                 .addPropertyNode("conversionMethod")
                 .addConstraintViolation();
             return false;
