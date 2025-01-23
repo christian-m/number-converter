@@ -25,6 +25,43 @@ public class DecimalToRomanConverterTest {
 
     private DecimalToRomanConverter converter;
 
+    @ParameterizedTest
+    @MethodSource("intToRomanTestdata")
+    @DisplayName("WHEN a valid integer is submitted to the converter THEN the appropriate roman number is returned as string")
+    public void testIntToRoman(String input, String expected) {
+        val result = converter.convert(input);
+        assertThat(result).isEqualTo(expected);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"", "x", "A", "-1", "4000"})
+    @DisplayName("WHEN an invalid value is submitted to the converter THEN an IllegalArgumentException is thrown")
+    public void testIntToRomanValueOutOfRange(String input) {
+        assertThatThrownBy(() -> converter.convert(input)).isInstanceOf(IllegalArgumentException.class)
+            .hasMessage(String.format("Submitted input '%s' is not a valid value or in the supported range", input));
+    }
+
+    @Test
+    @DisplayName("WHEN the conversion method DECIMAL_TO_ROMAN is submitted THEN true is returned, false otherwise")
+    public void testSupportTheCorrectMethod() {
+        assertThat(converter.supports(ConversionMethod.DECIMAL_TO_ROMAN)).isTrue();
+        assertThat(converter.supports(ConversionMethod.BINARY_TO_ROMAN)).isFalse();
+    }
+
+    @ParameterizedTest
+    @MethodSource("intToRomanTestdata")
+    @DisplayName("WHEN a valid value is submitted THEN the validation returns true")
+    public void testValidationSuccess(final String givenInput) {
+        assertThat(converter.isValid(givenInput)).isTrue();
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"", "x", "A", "-1", "4000"})
+    @DisplayName("WHEN an invalid value is submitted THEN the validation returns false")
+    public void testValidationFailure(final String givenInput) {
+        assertThat(converter.isValid(givenInput)).isFalse();
+    }
+
     private static Stream<Arguments> intToRomanTestdata() {
         return Stream.of(
             Arguments.of("0", ""),
@@ -68,42 +105,5 @@ public class DecimalToRomanConverterTest {
             Arguments.of("3000", "MMM"),
             Arguments.of("3999", "MMMCMXCIX")
         );
-    }
-
-    @ParameterizedTest
-    @MethodSource("intToRomanTestdata")
-    @DisplayName("WHEN a valid integer is submitted to the converter THEN the appropriate roman number is returned as string")
-    public void testIntToRoman(String input, String expected) {
-        val result = converter.convert(input);
-        assertThat(result).isEqualTo(expected);
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {"-1", "4000"})
-    @DisplayName("WHEN an integer out of range is submitted to the converter THEN an IllegalArgumentException is thrown")
-    public void testIntToRomanValueOutOfRange(String input) {
-        assertThatThrownBy(() -> converter.convert(input)).isInstanceOf(IllegalArgumentException.class)
-            .hasMessage(String.format("Submitted input '%s' is not a valid decimal value or is not in the range of 0 - 3999", input));
-    }
-
-    @Test
-    @DisplayName("WHEN the conversion method DECIMAL_TO_ROMAN is submitted THEN true is returned, false otherwise")
-    public void testSupportTheCorrectMethod() {
-        assertThat(converter.supports(ConversionMethod.DECIMAL_TO_ROMAN)).isTrue();
-        assertThat(converter.supports(ConversionMethod.BINARY_TO_ROMAN)).isFalse();
-    }
-
-    @ParameterizedTest
-    @MethodSource("intToRomanTestdata")
-    @DisplayName("WHEN a valid value is submitted THEN the validation returns true")
-    public void testValidationSuccess(final String givenInput) {
-        assertThat(converter.isValid(givenInput)).isTrue();
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {"", "x", "A", "-1", "4000"})
-    @DisplayName("WHEN an invalid value is submitted THEN the validation returns false")
-    public void testValidationFailure(final String givenInput) {
-        assertThat(converter.isValid(givenInput)).isFalse();
     }
 }

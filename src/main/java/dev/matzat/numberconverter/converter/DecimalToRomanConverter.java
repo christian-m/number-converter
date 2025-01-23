@@ -5,7 +5,7 @@ import lombok.val;
 import org.springframework.stereotype.Component;
 
 @Component
-public final class DecimalToRomanConverter implements Converter {
+public final class DecimalToRomanConverter extends BaseConverter {
 
     private static final int MIN_SUPPORTED_INPUT_VALUE = 0;
     private static final int MAX_SUPPORTED_INPUT_VALUE = 3999;
@@ -21,7 +21,7 @@ public final class DecimalToRomanConverter implements Converter {
             return false;
         }
         try {
-            int intValue = Integer.parseInt(value);
+            val intValue = Integer.parseInt(value);
             return intValue >= MIN_SUPPORTED_INPUT_VALUE && intValue <= MAX_SUPPORTED_INPUT_VALUE;
         } catch (NumberFormatException e) {
             return false;
@@ -29,11 +29,7 @@ public final class DecimalToRomanConverter implements Converter {
     }
 
     @Override
-    public String convert(final String value) throws IllegalArgumentException {
-        if (!isValid(value)) {
-            throw new IllegalArgumentException(String.format("Submitted input '%s' is not a valid decimal value or is not in the range of %d - %d",
-                value, MIN_SUPPORTED_INPUT_VALUE, MAX_SUPPORTED_INPUT_VALUE));
-        }
+    public String conversion(final String value) throws IllegalArgumentException {
         var input = Integer.parseInt(value);
         val roman = new StringBuilder();
         for (RomanBase conversionBase : RomanBase.values()) {

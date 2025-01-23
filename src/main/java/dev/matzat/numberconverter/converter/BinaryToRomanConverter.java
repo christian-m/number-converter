@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @AllArgsConstructor
-public final class BinaryToRomanConverter implements Converter {
+public final class BinaryToRomanConverter extends BaseConverter {
 
     private static final int MAX_SUPPORTED_INPUT_VALUE = 3999;
 
@@ -31,11 +31,7 @@ public final class BinaryToRomanConverter implements Converter {
     }
 
     @Override
-    public String convert(final String value) throws IllegalArgumentException {
-        if (!isValid(value)) {
-            throw new IllegalArgumentException(String.format("Submitted input '%s' is not a valid binary value or exceeds the limit of the maximum (%s)",
-                value, Integer.toBinaryString(MAX_SUPPORTED_INPUT_VALUE)));
-        }
+    public String conversion(final String value) throws IllegalArgumentException {
         val input = Integer.parseInt(value, 2);
         return decimalToRomanConverter.convert(Integer.toString(input));
     }
