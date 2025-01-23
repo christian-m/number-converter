@@ -45,7 +45,7 @@ public class ConverterController {
         @RequestBody
         final ConversionRequest conversionRequest
     ) {
-        val value = converterResolver.resolve(conversionRequest.getConversionMethod()).convert(conversionRequest.getValue());
+        val value = converterResolver.resolve(conversionRequest.conversionMethod()).convert(conversionRequest.value());
         return ResponseEntity.ok().body(value);
     }
 }

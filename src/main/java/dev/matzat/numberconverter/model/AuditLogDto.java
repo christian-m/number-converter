@@ -1,16 +1,12 @@
 package dev.matzat.numberconverter.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-
 import java.time.Instant;
 
-@AllArgsConstructor
-@Data
-public class AuditLogDto {
-    private Instant timestamp;
-    private String input;
-    private String output;
-    private String statusCode;
-    private boolean success;
+public record AuditLogDto(
+    Instant timestamp,
+    String input,
+    String output,
+    String statusCode,
+    boolean success
+) {
 }

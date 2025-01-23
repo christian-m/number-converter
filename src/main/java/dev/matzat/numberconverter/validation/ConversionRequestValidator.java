@@ -32,8 +32,8 @@ public final class ConversionRequestValidator implements ConstraintValidator<Val
     @Override
     public boolean isValid(final ConversionRequest conversionRequest, final ConstraintValidatorContext context) {
         try {
-            val converter = converterResolver.resolve(conversionRequest.getConversionMethod());
-            if (converter.isValid(conversionRequest.getValue())) {
+            val converter = converterResolver.resolve(conversionRequest.conversionMethod());
+            if (converter.isValid(conversionRequest.value())) {
                 return true;
             }
             context.disableDefaultConstraintViolation();
