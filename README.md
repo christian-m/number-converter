@@ -63,6 +63,6 @@ There is a prepared `compose.yml` to use with Docker locally.
 
 ## Motivation
 
-* Getting back into Java after some years of using Kotlin
+* Getting back into Java after some years of using Kotlin (a Kotlin implementation can be found [here](https://github.com/christian-m/number-converter-kt))
 * Getting more practice with Maven again, because I haven't used it for a long time
 * Using Spring WebFlux that I never used before, just out of curiosity, how it would behave compared to Spring Web MVC (wouldn't do that in a productive project though ;-)) 
